@@ -1,5 +1,5 @@
 out
 *.iml
 .idea
-*.csv
+src/*.csv
 *.csv#
