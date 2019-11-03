@@ -1,11 +1,15 @@
+package caches;
+
+import measurements.Measurement;
+
 public class RANDCache implements Cache {
     private final Integer[] entries;
 
     public RANDCache(int size) {
         this.entries = new Integer[size];
 
-        for (int i = 0; i < size; i++) {
-            entries[i] = i;
+        for (int i = 1; i <= size; i++) {
+            entries[i - 1] = i;
         }
     }
 
@@ -32,6 +36,6 @@ public class RANDCache implements Cache {
 
     @Override
     public String toString() {
-        return "RANDCache(" + entries.length + ")";
+        return "caches.RANDCache(" + entries.length + ")";
     }
 }

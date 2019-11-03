@@ -1,39 +1,77 @@
+import caches.Cache;
+import caches.FIFOCache;
+import distributions.Discrete;
+import distributions.Exp;
+import measurements.Measurement;
+
 public class Simulation {
-    public static Double TIME = 0.0;
+    private static Double TIME = 0.0;
 
-    private static final Integer N = 1000;
-    private static final Integer M = 100;
-    private static final Cache cache = new FIFOCache(M);
+    private static final Integer N = 3;
+    private static final Integer M = 2;
+    private static final Double WARMUP = 400.0;
     private static final Double RUNTIME = 1000.0;
+    private static final Integer REPLICATION = 1000;
 
+    private static Cache cache;
 
     public static void main(String[] args) {
-        System.out.println("Running simulation on cache strategy " + cache.toString() + " with memory size " + N);
+        double combinedRate = calcRate();
 
+        Double[] probabilities = calcProbabilities(combinedRate);
+
+        Discrete discrete = new Discrete(probabilities);
+
+        for (int i = 0; i < REPLICATION; i++) {
+            TIME = 0.0;
+
+            cache = new FIFOCache(M);
+
+            warmup(combinedRate, discrete);
+
+            Measurement.start();
+
+            run(combinedRate, discrete);
+
+            Measurement.finish(TIME);
+        }
+
+        Measurement.stats();
+    }
+
+    private static double calcRate() {
         double combinedRate = 0;
-        Double[] probabilities = new Double[N];
 
         for (double i = 1; i <= N; i++) {
             combinedRate += 1 / i;
         }
+        return combinedRate;
+    }
 
+    private static Double[] calcProbabilities(double combinedRate) {
+        Double[] probabilities = new Double[N];
         for (double i = 0; i < N; i++) {
             probabilities[(int) i] = (1 / ((i + 1) * combinedRate));
         }
+        return probabilities;
+    }
 
-        Discrete discrete = new Discrete(probabilities);
-
-        Measurement.start();
-
-        while (TIME < RUNTIME) {
+    private static void run(double combinedRate, Discrete discrete) {
+        while (TIME < WARMUP + RUNTIME) {
             double interArrivalTime = Exp.rand(combinedRate);
             TIME += interArrivalTime;
 
             generateArrival(discrete);
         }
+    }
 
-        Measurement.print();
-        Measurement.csv();
+    private static void warmup(double combinedRate, Discrete discrete) {
+        while (TIME < WARMUP) {
+            double interArrivalTime = Exp.rand(combinedRate);
+            TIME += interArrivalTime;
+
+            generateArrival(discrete);
+        }
     }
 
     private static void generateArrival(Discrete discrete) {

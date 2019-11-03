@@ -1,3 +1,5 @@
+package distributions;
+
 public class Discrete {
     private final Double[] probabilities;
 

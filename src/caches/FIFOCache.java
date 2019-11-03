@@ -1,3 +1,7 @@
+package caches;
+
+import measurements.Measurement;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -6,7 +10,7 @@ public class FIFOCache implements Cache {
 
     public FIFOCache(int size) {
         entries = new LinkedList<>();
-        for (int i = 0; i < size; i++) {
+        for (int i = 1; i <= size; i++) {
             entries.add(i);
         }
     }
@@ -30,6 +34,6 @@ public class FIFOCache implements Cache {
 
     @Override
     public String toString() {
-        return "FIFOCache(" + entries.size() + ")";
+        return "caches.FIFOCache(" + entries.size() + ")";
     }
 }
